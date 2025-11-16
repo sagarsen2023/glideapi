@@ -1,0 +1,48 @@
+{
+  "name": "glideapi",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/sagarsen2023/glideapi#readme",
+  "bugs": {
+    "url": "https://github.com/sagarsen2023/glideapi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sagarsen2023/glideapi.git"
+  },
+  "author": "Sagar Sen <sagarsen.dev@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "glideapi": "bin/index.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "backend",
+    "project-structure",
+    "api",
+    "express",
+    "aws-s3",
+    "cloudflare",
+    "typescript",
+    "framework",
+    "boilerplate"
+  ],
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "fs-extra": "^11.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}
