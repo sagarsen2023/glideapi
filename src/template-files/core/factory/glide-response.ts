@@ -1,4 +1,4 @@
-export interface GlideApiBaseResponseType {
+export interface BaseResponseType {
   error: boolean;
   statusCode: number;
   status: boolean;
@@ -11,7 +11,7 @@ export interface GlideApiBaseResponseType {
   responseTimestamp: string;
 }
 
-class GlideApiResponseHandler {
+class GlideResponseHandler {
   successResponse(data?: any) {
     return {
       error: false,
@@ -19,7 +19,7 @@ class GlideApiResponseHandler {
       status: true,
       responseTimestamp: new Date().toISOString(),
       data,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   successResponseWithCount({
@@ -36,7 +36,7 @@ class GlideApiResponseHandler {
       totalCount,
       responseTimestamp: new Date().toISOString(),
       data,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   standardErrorResponse(error?: unknown, statusCode = 500) {
@@ -51,7 +51,7 @@ class GlideApiResponseHandler {
       status: false,
       responseTimestamp: new Date().toISOString(),
       message,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   createResponse(data?: any) {
@@ -62,7 +62,7 @@ class GlideApiResponseHandler {
       created: true,
       responseTimestamp: new Date().toISOString(),
       data,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   updateResponse(data?: any) {
@@ -73,29 +73,7 @@ class GlideApiResponseHandler {
       updated: true,
       responseTimestamp: new Date().toISOString(),
       data,
-    } as GlideApiBaseResponseType;
-  }
-
-  createErrorResponse(error?: any) {
-    try {
-      // Considering MongoDB duplicate key error code 11000
-      const errorCode = error?.code || 11000;
-      if (errorCode === 11000 && error?.keyValue) {
-        return {
-          error: true,
-          statusCode: 409,
-          status: false,
-          data: null,
-          responseTimestamp: new Date().toISOString(),
-          message: `This ${
-            Object.keys(error?.keyValue)?.[0]
-          } is already registered.`,
-        } as GlideApiBaseResponseType;
-      }
-      return this.standardErrorResponse(error, 400);
-    } catch (err) {
-      return this.standardErrorResponse(err, 400);
-    }
+    } as BaseResponseType;
   }
 
   deleteResponse(data?: any) {
@@ -106,7 +84,7 @@ class GlideApiResponseHandler {
       deleted: true,
       responseTimestamp: new Date().toISOString(),
       data,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   unAuthorizedResponse(error?: unknown) {
@@ -121,7 +99,7 @@ class GlideApiResponseHandler {
       data: error,
       responseTimestamp: new Date().toISOString(),
       message,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
   }
 
   notFoundResponse(message?: string) {
@@ -132,8 +110,29 @@ class GlideApiResponseHandler {
       data: null,
       responseTimestamp: new Date().toISOString(),
       message,
-    } as GlideApiBaseResponseType;
+    } as BaseResponseType;
+  }
+
+  insertionErrorResponse(error?: any) {
+    try {
+      const errorCode = error?.code || 11000;
+      if (errorCode === 11000 && error?.keyValue) {
+        return {
+          error: true,
+          statusCode: 409,
+          status: false,
+          data: null,
+          responseTimestamp: new Date().toISOString(),
+          message: `This ${
+            Object.keys(error?.keyValue)?.[0]
+          } is already registered.`,
+        } as BaseResponseType;
+      }
+      return this.standardErrorResponse(error, 400);
+    } catch (err) {
+      return this.standardErrorResponse(err, 400);
+    }
   }
 }
 
-export const glideApiResponseHandler = new GlideApiResponseHandler();
+export const glideResponseHandler = new GlideResponseHandler();

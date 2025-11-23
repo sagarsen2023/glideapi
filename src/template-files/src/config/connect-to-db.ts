@@ -1,8 +1,8 @@
-import { errorLog, successLog } from "@/utils/log";
 import mongoose from "mongoose";
 import { config } from ".";
+import { errorLog, successLog } from "@/utils/logger";
 
-export const connectToMongoDB = async () => {
+export const connectToDb = async () => {
   const uri = config.mongoUri;
   if (!uri) {
     errorLog("MONGODB_URI is not defined in environment variables");
