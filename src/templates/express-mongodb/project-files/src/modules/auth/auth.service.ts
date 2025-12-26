@@ -28,7 +28,6 @@ export class AuthService {
         _id: user._id,
         email: user.email,
         fullName: user.fullName,
-        role: user.role,
       },
       config.jwtSecret,
       { expiresIn: "30d" },

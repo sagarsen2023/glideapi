@@ -35,7 +35,7 @@ export const expressMongodbConfig = async (
 
   return {
     name: "Express with MongoDB",
-    command: `npm init -y ${folderName} && cd ${folderName} && npm i express mongoose cors dotenv bcrypt chalk fs-extra jsonwebtoken zod && npm i -D @types/bcrypt @types/cors @types/express @types/fs-extra @types/jsonwebtoken @types/mongoose @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint ts-node ts-node-dev tsc-alias tsconfig-paths typescript`,
+    command: `npm init -y ${folderName === "." ? "" : folderName} && cd ${folderName} && npm i express mongoose cors dotenv bcrypt chalk fs-extra jsonwebtoken zod && npm i -D @types/bcrypt @types/cors @types/express @types/fs-extra @types/jsonwebtoken @types/mongoose @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint ts-node ts-node-dev tsc-alias tsconfig-paths typescript`,
 
     templateFiles: [
       // ? All files and folders under project-files copied into folderName

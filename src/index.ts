@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { initCommand } from "./config/initialize-project.config";
+import { generateModuleCommand } from "./config/generate-module.config";
 
 const program = new Command();
 
@@ -14,6 +15,6 @@ program
 program.addCommand(initCommand);
 
 // Module generation command
-// program.addCommand(generateModuleCommand);
+program.addCommand(generateModuleCommand);
 
 program.parse();
