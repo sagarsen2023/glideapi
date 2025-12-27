@@ -4,7 +4,7 @@ import { config } from "@/config";
 import { glideResponseHandler } from "./glide-response";
 import * as z from "zod";
 import { GlideService } from "./glide-service";
-import { infoLog } from "@/utils/logger";
+import { errorLog, infoLog } from "@/utils/logger";
 
 interface GlideControllerConstructorType {
   endPoint: string;
@@ -46,20 +46,25 @@ export class GlideController {
     try {
       if (isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert controller hit successfully`,
         );
       }
       const data = req.body;
+
+      console.log(req.body);
+
       if (!data) {
         throw new Error("No data provided for insertion");
       }
-      const result = await this.service.insert(data);
 
+      const validatedData = this.dtoConfig?.insertDTO?.parse(data) ?? data;
+
+      const result = await this.service.insert(validatedData);
       return res.status(200).send(glideResponseHandler.successResponse(result));
     } catch (error) {
       if (isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in insert method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in insert controller - ${
             (error as Error).message
           }`,
         );
@@ -74,7 +79,7 @@ export class GlideController {
     try {
       if (isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getAll method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getAll controller hit successfully`,
         );
       }
 
@@ -92,8 +97,8 @@ export class GlideController {
         .send(glideResponseHandler.successResponseWithCount(result));
     } catch (error) {
       if (isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getAll method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getAll controller - ${
             (error as Error).message
           }`,
         );
@@ -108,7 +113,7 @@ export class GlideController {
     try {
       if (isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById controller hit successfully`,
         );
       }
 
@@ -123,8 +128,8 @@ export class GlideController {
       return res.status(200).send(glideResponseHandler.successResponse(result));
     } catch (error) {
       if (isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getById method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getById controller - ${
             (error as Error).message
           }`,
         );
@@ -139,21 +144,21 @@ export class GlideController {
     try {
       if (isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: update method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: update controller hit successfully`,
         );
       }
 
       const { id } = req.params;
       const data = req.body;
-      const result = (await this.service?.update?.(id, data)) ?? {
+      const result = (await this.service?.update?.({ id, data })) ?? {
         message: "No service configured for update",
       };
 
       return res.status(200).send(glideResponseHandler.successResponse(result));
     } catch (error) {
       if (isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in update method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in update controller - ${
             (error as Error).message
           }`,
         );
@@ -168,7 +173,7 @@ export class GlideController {
     try {
       if (isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: delete method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: delete controller hit successfully`,
         );
       }
       const { id } = req.params;
@@ -179,8 +184,8 @@ export class GlideController {
       return res.status(200).send(glideResponseHandler.successResponse(result));
     } catch (error) {
       if (isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in delete method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in delete controller - ${
             (error as Error).message
           }`,
         );

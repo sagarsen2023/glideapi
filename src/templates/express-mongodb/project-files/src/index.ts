@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import { config } from "./config";
 import { successLog } from "./utils/logger";
-import { setupAllRoutes } from "./plugins/setup-all-routes";
 import { connectToDb } from "./config/connect-to-db";
 import { initializeCore } from "core";
 
@@ -10,17 +9,24 @@ const port = config.port;
 
 const app = express();
 
-connectToDb();
-
-initializeCore();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// API Routes
-setupAllRoutes(app);
+const initializeApp = async () => {
+  await connectToDb();
+  await initializeCore();
 
-app.listen(port, () => {
-  successLog(`Server is running on port ${port} ===> http://localhost:${port}`);
-});
+  // API Routes - dynamically import after generation
+  const { setupAllRoutes } = await import("./plugins/setup-all-routes");
+  await setupAllRoutes(app);
+
+  app.listen(port, () => {
+    successLog(
+      `Server is running on port ${port} ===> http://localhost:${port}`,
+    );
+  });
+};
+
+initializeApp();

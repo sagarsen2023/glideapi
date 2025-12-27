@@ -128,6 +128,16 @@ class GlideResponseHandler {
           } is already registered.`,
         } as BaseResponseType;
       }
+      if ((error as Error).name === "ZodError") {
+        return {
+          error: true,
+          statusCode: 400,
+          status: false,
+          data: null,
+          responseTimestamp: new Date().toISOString(),
+          message: `Validation failed. Please check the input data.`,
+        };
+      }
       return this.standardErrorResponse(error, 400);
     } catch (err) {
       return this.standardErrorResponse(err, 400);

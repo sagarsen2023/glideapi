@@ -3,13 +3,12 @@ import { config } from "@/config";
 import { BasicPaginationRequest } from "@/types/base-request.type";
 import * as z from "zod";
 import { ParsedQs } from "qs";
-import { infoLog } from "@/utils/logger";
+import { errorLog, infoLog } from "@/utils/logger";
 
 // Interface for pagination and search parameters
 export interface GlideServiceGetAllParams<T> {
   getDTO?: z.ZodType<T>;
   populateFields?: PopulateOptions[]; // Use Mongoose's PopulateOptions type
-  additionalOptions?: Record<string, any>;
   queryParams?: {
     [key: string]: string | ParsedQs | (string | ParsedQs)[] | undefined;
   };
@@ -95,8 +94,8 @@ export class GlideService<T extends Document> {
       };
     } catch (error) {
       if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getAll method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getAll service - ${
             (error as Error).message
           }`,
         );
@@ -113,7 +112,7 @@ export class GlideService<T extends Document> {
     try {
       if (this.isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById service hit successfully`,
         );
       }
 
@@ -137,7 +136,7 @@ export class GlideService<T extends Document> {
     } catch (error) {
       if (this.isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getById method - ${
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getById service - ${
             (error as Error).message
           }`,
         );
@@ -150,7 +149,7 @@ export class GlideService<T extends Document> {
     try {
       if (this.isDebugMode) {
         infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert method hit successfully`,
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert service hit successfully`,
         );
       }
 
@@ -158,8 +157,8 @@ export class GlideService<T extends Document> {
       return await doc.save();
     } catch (error) {
       if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in insert method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in insert service - ${
             (error as Error).message
           }`,
         );
@@ -168,7 +167,13 @@ export class GlideService<T extends Document> {
     }
   }
 
-  async update(id: string, data: Partial<T>): Promise<T | null> {
+  async update({
+    id,
+    data,
+  }: {
+    id: string;
+    data: Partial<T>;
+  }): Promise<T | null> {
     try {
       if (this.isDebugMode) {
         infoLog(
@@ -179,8 +184,8 @@ export class GlideService<T extends Document> {
       return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
     } catch (error) {
       if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in update method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in update service - ${
             (error as Error).message
           }`,
         );
@@ -200,8 +205,8 @@ export class GlideService<T extends Document> {
       return await this.model.findByIdAndDelete(id).exec();
     } catch (error) {
       if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in delete method - ${
+        errorLog(
+          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in delete service - ${
             (error as Error).message
           }`,
         );
