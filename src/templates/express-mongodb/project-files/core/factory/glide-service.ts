@@ -3,7 +3,7 @@ import { config } from "@/config";
 import { BasicPaginationRequest } from "@/types/base-request.type";
 import * as z from "zod";
 import { ParsedQs } from "qs";
-import { errorLog, infoLog } from "@/utils/logger";
+import { infoLog } from "@/utils/logger";
 
 // Interface for pagination and search parameters
 export interface GlideServiceGetAllParams<T> {
@@ -45,63 +45,54 @@ export class GlideService<T extends Document> {
     data: T[];
     totalCount: number;
   }> {
-    try {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getAll method hit successfully`,
-        );
-      }
-
-      const { skip, limit, search, isDeleted } = queryParams || {};
-
-      const pagination: BasicPaginationRequest = {
-        skip: Number(skip),
-        limit: Number(limit) || 10,
-        search: String(search),
-      };
-
-      // Construct query filter with optional soft delete and search
-      const queryFilter: Record<string, any> = {
-        ...(isDeleted === "false" && { isDeleted: false }),
-      };
-
-      // ? Calculate total count before pagination
-      const totalCount = await this.model.countDocuments(queryFilter).exec();
-
-      // ? Apply pagination and populate fields
-      let query = this.model
-        .find(queryFilter)
-        .limit(pagination.limit ?? 10)
-        .skip(pagination.skip ?? 0)
-        .sort({ createdAt: -1 }); // Latest first
-
-      if (populateFields && populateFields.length > 0) {
-        populateFields.forEach((field) => {
-          query = query?.populate(field);
-        });
-      }
-
-      const docs = await query.exec();
-
-      // ? Parse documents if getDTO is provided
-      const data = getDTO
-        ? docs.map((doc) => getDTO.parse(doc.toObject()))
-        : docs;
-
-      return {
-        data,
-        totalCount,
-      };
-    } catch (error) {
-      if (this.isDebugMode) {
-        errorLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getAll service - ${
-            (error as Error).message
-          }`,
-        );
-      }
-      throw error;
+    if (this.isDebugMode) {
+      infoLog(
+        `[GlideAPI - ${new Date().toLocaleTimeString()}]: getAll method hit successfully`,
+      );
     }
+
+    const { offset, limit, search, isDeleted, ...restQuery } =
+      queryParams || {};
+
+    const pagination: BasicPaginationRequest = {
+      offset: Number(offset),
+      limit: Number(limit) || 10,
+      search: String(search),
+    };
+
+    // Construct query filter with optional soft delete and search
+    const queryFilter: Record<string, any> = {
+      ...restQuery,
+      ...(isDeleted === "false" && { isDeleted: false }),
+    };
+
+    // ? Calculate total count before pagination
+    const totalCount = await this.model.countDocuments(queryFilter).exec();
+
+    // ? Apply pagination and populate fields
+    let query = this.model
+      .find(queryFilter)
+      .limit(pagination.limit ?? 10)
+      .skip(pagination.offset ?? 0)
+      .sort({ createdAt: -1 }); // Latest first
+
+    if (populateFields && populateFields.length > 0) {
+      populateFields.forEach((field) => {
+        query = query?.populate(field);
+      });
+    }
+
+    const docs = await query.exec();
+
+    // ? Parse documents if getDTO is provided
+    const data = getDTO
+      ? docs.map((doc) => getDTO.parse(doc.toObject()))
+      : docs;
+
+    return {
+      data,
+      totalCount,
+    };
   }
 
   async getById({
@@ -109,62 +100,40 @@ export class GlideService<T extends Document> {
     getDTO,
     populateFields,
   }: GlideServiceGetByIdParams<T>): Promise<T | null> {
-    try {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById service hit successfully`,
-        );
-      }
-
-      let query = this.model.findById(id);
-
-      if (populateFields && populateFields.length > 0) {
-        populateFields.forEach((pop) => {
-          query = query.populate(pop);
-        });
-      }
-
-      const doc = await query.exec();
-      if (!doc) {
-        return null;
-      }
-
-      // ? Parse document if getDTO is provided
-      const parsedData = getDTO ? getDTO.parse(doc.toObject()) : doc;
-
-      return parsedData;
-    } catch (error) {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in getById service - ${
-            (error as Error).message
-          }`,
-        );
-      }
-      throw error;
+    if (this.isDebugMode) {
+      infoLog(
+        `[GlideAPI - ${new Date().toLocaleTimeString()}]: getById service hit successfully`,
+      );
     }
+
+    let query = this.model.findById(id);
+
+    if (populateFields && populateFields.length > 0) {
+      populateFields.forEach((pop) => {
+        query = query.populate(pop);
+      });
+    }
+
+    const doc = await query.exec();
+    if (!doc) {
+      return null;
+    }
+
+    // ? Parse document if getDTO is provided
+    const parsedData = getDTO ? getDTO.parse(doc.toObject()) : doc;
+
+    return parsedData;
   }
 
-  async insert(data: Partial<T>): Promise<T> {
-    try {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert service hit successfully`,
-        );
-      }
-
-      const doc = new this.model(data);
-      return await doc.save();
-    } catch (error) {
-      if (this.isDebugMode) {
-        errorLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in insert service - ${
-            (error as Error).message
-          }`,
-        );
-      }
-      throw error;
+  async insert(data: Partial<T>): Promise<T | null> {
+    if (this.isDebugMode) {
+      infoLog(
+        `[GlideAPI - ${new Date().toLocaleTimeString()}]: insert service hit successfully`,
+      );
     }
+
+    const doc = new this.model(data);
+    return await doc.save();
   }
 
   async update({
@@ -174,44 +143,29 @@ export class GlideService<T extends Document> {
     id: string;
     data: Partial<T>;
   }): Promise<T | null> {
-    try {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: update method hit successfully`,
-        );
-      }
-
-      return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
-    } catch (error) {
-      if (this.isDebugMode) {
-        errorLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in update service - ${
-            (error as Error).message
-          }`,
-        );
-      }
-      throw error;
+    if (this.isDebugMode) {
+      infoLog(
+        `[GlideAPI - ${new Date().toLocaleTimeString()}]: update method hit successfully`,
+      );
     }
+
+    const dataFromDB = await this.model.findById(id);
+
+    if (!dataFromDB) {
+      throw new Error("Document not found");
+    }
+
+    Object.assign(dataFromDB, data);
+    return await dataFromDB.save();
   }
 
   async delete(id: string): Promise<T | null> {
-    try {
-      if (this.isDebugMode) {
-        infoLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: delete method hit successfully`,
-        );
-      }
-
-      return await this.model.findByIdAndDelete(id).exec();
-    } catch (error) {
-      if (this.isDebugMode) {
-        errorLog(
-          `[GlideAPI - ${new Date().toLocaleTimeString()}]: Error in delete service - ${
-            (error as Error).message
-          }`,
-        );
-      }
-      throw error;
+    if (this.isDebugMode) {
+      infoLog(
+        `[GlideAPI - ${new Date().toLocaleTimeString()}]: delete method hit successfully`,
+      );
     }
+
+    return await this.model.findByIdAndDelete(id).exec();
   }
 }
