@@ -931,15 +931,12 @@ MIT © 2024-present [Sagar Sen](https://github.com/sagarsen2023)
 ## Roadmap
 
 🚀 Upcoming features:
-- [ ] Additional templates (Fastify, NestJS, etc.)
 - [ ] Support for PostgreSQL, MySQL
-- [ ] GraphQL support
 - [ ] Built-in API documentation generation
 - [ ] Testing utilities and scaffolding
 - [ ] Docker configuration generation
 - [ ] CI/CD pipeline templates
 - [ ] File upload handling
-- [ ] Real-time features with WebSocket
 - [ ] Rate limiting middleware
 - [ ] API versioning support
 
