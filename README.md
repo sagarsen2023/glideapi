@@ -61,7 +61,7 @@ glideapi init my-project
 ```
 
 You'll be prompted to choose a database template:
-- **express-mongodb**: Express.js with MongoDB (currently available)
+- **express-mongodb**: Express.js with MongoDB
 - More templates coming soon!
 
 ### 2. Navigate to Your Project
@@ -915,7 +915,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 ## License
 
-MIT © [Sagar Sen](https://github.com/sagarsen2023)
+MIT © 2024-present [Sagar Sen](https://github.com/sagarsen2023)
 
 ---
 

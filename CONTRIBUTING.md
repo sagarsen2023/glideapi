@@ -496,10 +496,20 @@ npm run dev
 
 Currently, the project doesn't have automated tests. **We welcome contributions to add test infrastructure!**
 
-Potential test frameworks to consider:
-- Jest for unit tests
-- Integration tests for CLI commands
-- E2E tests for generated projects
+Potential test frameworks and testing areas to consider:
+
+**Test Frameworks:**
+- Jest or Vitest for unit tests
+- Execa or similar for testing CLI commands
+- Integration tests for generated projects
+
+**Priority Testing Areas:**
+1. **CLI Command Tests** - Test `init` and `generate-module` commands
+2. **Template Generation Tests** - Verify correct file generation
+3. **Cross-Platform Compatibility Tests** - Test on Windows, Mac, and Linux
+4. **Generated Code Validation** - Ensure generated code compiles without errors
+5. **Module Generation Tests** - Verify generated modules work correctly
+6. **Path Resolution Tests** - Test template file copying and path resolution
 
 ---
 
